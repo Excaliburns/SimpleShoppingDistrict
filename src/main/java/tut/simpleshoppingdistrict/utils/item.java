@@ -14,7 +14,7 @@ public class item extends ItemStack {
 
         toolMeta.setDisplayName(ChatColor.AQUA + "SimpleShoppingDistrict Tool");
         toolMeta.setUnbreakable(true);
-        toolMeta.
+       // toolMeta.
         this.setItemMeta(toolMeta);
     }
 }
