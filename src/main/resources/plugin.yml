@@ -1,0 +1,7 @@
+name: SimpleShoppingDistrict
+version: ${project.version}
+main: tut.simpleshoppingdistrict.SimpleShoppingDistrict
+api-version: 1.13
+prefix: SimpleShoppingDistrict
+authors: [tut]
+description: A simple shopping district for your server. Claim plots of land for items!
