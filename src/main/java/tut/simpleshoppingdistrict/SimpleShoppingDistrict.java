@@ -1,10 +1,11 @@
 package tut.simpleshoppingdistrict;
 
 import org.bukkit.plugin.java.JavaPlugin;
+import tut.simpleshoppingdistrict.commands.SSDBaseCommand;
 
 import java.util.logging.Logger;
 
-public final class SimpleShoppingDistrict extends JavaPlugin {
+public class SimpleShoppingDistrict extends JavaPlugin {
     public Logger logger = this.getLogger();
 
     //This runs after program has ben loaded and before it has been enabled.
@@ -13,10 +14,15 @@ public final class SimpleShoppingDistrict extends JavaPlugin {
         logger.info("SimpleShoppingDistrict has loaded!");
     }
 
+
+    // After program enabled
     @Override
     public void onEnable() {
         // Plugin startup logic
+        getServer().getPluginManager().registerEvents(new Events(), this);
 
+        // Add the SSDBaseCommand as the Executor to the command "ssd"
+        this.getCommand("ssd").setExecutor(new SSDBaseCommand());
     }
 
     @Override
