@@ -7,7 +7,7 @@ import java.util.logging.Logger;
 public final class SimpleShoppingDistrict extends JavaPlugin {
     public Logger logger = this.getLogger();
 
-    //This runs after program has been loaded
+    //This runs after program has ben loaded and before it has been enabled.
     @Override
     public void onLoad() {
         logger.info("SimpleShoppingDistrict has loaded!");
