@@ -2,6 +2,7 @@ package tut.simpleshoppingdistrict;
 
 import org.bukkit.plugin.java.JavaPlugin;
 import tut.simpleshoppingdistrict.commands.SSDBaseCommand;
+import tut.simpleshoppingdistrict.utils.SSDCache;
 
 import java.util.logging.Logger;
 
@@ -12,6 +13,7 @@ public class SimpleShoppingDistrict extends JavaPlugin {
     @Override
     public void onLoad() {
         logger.info("SimpleShoppingDistrict has loaded!");
+        SSDCache.initCaches();
     }
 
 

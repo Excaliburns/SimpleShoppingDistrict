@@ -1,9 +1,12 @@
 package tut.simpleshoppingdistrict;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
+import tut.simpleshoppingdistrict.data.SSDRegion;
+import tut.simpleshoppingdistrict.utils.SSDCache;
 import tut.simpleshoppingdistrict.utils.SSDLogger;
 import tut.simpleshoppingdistrict.utils.SimpleShoppingDistrictItemsUtils;
 
@@ -24,8 +27,55 @@ public class Events implements Listener {
                 if ((event.getClickedBlock() != null && event.getClickedBlock().isEmpty()) || event.getClickedBlock() == null) {
                     logger.info("Interact block was empty or null.");
                 } else {
-                    event.getPlayer().sendMessage(ChatColor.AQUA + "Interacted with a block!");
+                    String UUID = event.getPlayer().getUniqueId().toString();
+
+                    if (SSDCache.playerDrawingRegionCache.containsKey(UUID)) {
+                        boolean isPlayerDrawingRegion = SSDCache.playerDrawingRegionCache.get(UUID);
+
+                        if (isPlayerDrawingRegion) {
+                            SSDRegion regionInProgress;
+
+                            if (SSDCache.regionInProgressCache.containsKey(UUID)) {
+                                regionInProgress = SSDCache.regionInProgressCache.get(UUID);
+
+                                if (regionInProgress.isCompleteRegion()) {
+                                    logger.warning("Something is wrong. Region is complete but was still being drawn.");
+                                } else {
+                                    regionInProgress.setBound2(event.getClickedBlock().getLocation());
+                                    event.getPlayer().sendMessage(ChatColor.AQUA + "Set Bound 2!");
+
+                                    regionInProgress.setCompleteRegion(true);
+                                    event.getPlayer().sendMessage(ChatColor.AQUA + "Region complete!");
+
+                                    SSDCache.finishDrawingRegion(UUID, regionInProgress);
+                                }
+                            } else {
+                                logger.warning("Something is wrong. Player was drawing region but cache does not contain their key.");
+                            }
+
+
+                        } else {
+                            initializeDrawingBounds(event);
+                        }
+                    } else {
+                        initializeDrawingBounds(event);
+                    }
                 }
             }
+    }
+
+    private void initializeDrawingBounds(PlayerInteractEvent event) {
+        event.getPlayer().sendMessage(ChatColor.AQUA + "Starting Drawing Bounds");
+
+        //Make new SSD Region that we put in the cache of all regions
+        SSDRegion region = new SSDRegion(event.getClickedBlock().getWorld());
+
+        Location location = event.getClickedBlock().getLocation();
+        region.setBound1(location);
+        event.getPlayer().sendMessage(ChatColor.AQUA + "Set Bound 1!");
+
+        String UUID = event.getPlayer().getUniqueId().toString();
+        SSDCache.playerDrawingRegionCache.put(UUID, true);
+        SSDCache.regionInProgressCache.put(UUID, region);
     }
 }
