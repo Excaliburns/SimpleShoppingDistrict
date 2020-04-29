@@ -3,8 +3,7 @@ package tut.simpleshoppingdistrict.utils;
 import tut.simpleshoppingdistrict.data.SSDRegion;
 
 import javax.xml.stream.Location;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 
 public class SSDCache {
     // Stores flag if player is drawing
@@ -17,7 +16,7 @@ public class SSDCache {
 
     //Stores player regions
     //Key is player UUID
-    public static HashMap<String, ArrayList<SSDRegion>> playerRegionCache;
+    public static HashMap<String, TreeSet<SSDRegion>> playerRegionCache;
 
     public static void initCaches() {
         playerDrawingRegionCache    = new HashMap<>();
@@ -27,14 +26,14 @@ public class SSDCache {
 
     public static void finishDrawingRegion(final String UUID, SSDRegion finishedRegion) {
         if (playerRegionCache.containsKey(UUID)) {
-            ArrayList<SSDRegion> regionList = playerRegionCache.get(UUID);
+            TreeSet<SSDRegion> regionList = playerRegionCache.get(UUID);
             regionList.add(finishedRegion);
 
             playerRegionCache.put(UUID, regionList);
             regionInProgressCache.remove(UUID);
             playerDrawingRegionCache.remove(UUID);
         } else {
-            playerRegionCache.put(UUID, new ArrayList<SSDRegion>() {{ add(finishedRegion); }});
+            playerRegionCache.put(UUID, new TreeSet<SSDRegion>() {{ add(finishedRegion); }});
             regionInProgressCache.remove(UUID);
             playerDrawingRegionCache.remove(UUID);
         }
