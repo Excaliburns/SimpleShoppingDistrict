@@ -9,12 +9,8 @@ import java.util.ArrayList;
 
 public class SimpleShoppingDistrictItemsUtils {
 
-    public static ItemStack SimpleShoppingDistrictSelector(int position) {
-        return new ItemStack(Material.BIRCH_BOAT);
-    }
-
     public static ItemStack SimpleShoppingDistrictTool() {
-        ItemStack tool = new ItemStack(Material.CARROT, 1);
+        ItemStack tool = new ItemStack(Material.CARROT_ON_A_STICK, 1);
         ItemMeta toolMeta = tool.getItemMeta();
 
         toolMeta.setDisplayName(ChatColor.AQUA + "SimpleShoppingDistrict Tool");

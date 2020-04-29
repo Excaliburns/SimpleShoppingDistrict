@@ -19,8 +19,20 @@ public class SSDBaseCommand implements CommandExecutor {
         if (sender instanceof Player) {
                 final Player player = ((Player) sender).getPlayer();
 
-                if (player != null) {
-                    player.getInventory().addItem(SimpleShoppingDistrictItemsUtils.SimpleShoppingDistrictTool());
+                if (args.length == 0) {
+
+                    if (player != null) {
+                        player.getInventory().addItem(SimpleShoppingDistrictItemsUtils.SimpleShoppingDistrictTool());
+                    }
+
+
+                }
+                else if (args.length == 1) {
+                    String arg = args[0];
+
+                    if (arg.equalsIgnoreCase("regions")) {
+                        return SSDDisplayRegionsCommand.SSDRegionCommand(sender);
+                    }
                 }
 
                 return true;
