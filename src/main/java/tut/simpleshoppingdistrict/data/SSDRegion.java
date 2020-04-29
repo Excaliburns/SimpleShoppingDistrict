@@ -3,14 +3,14 @@ package tut.simpleshoppingdistrict.data;
 import org.bukkit.Location;
 import org.bukkit.World;
 
-public class SSDRegion {
+public class SSDRegion implements Comparable<SSDRegion> {
     int regionID;
     Location bound1;
     Location bound2;
     boolean completeRegion;
 
-    public SSDRegion(World world) {
-        regionID = 0;
+    public SSDRegion(World world, int regionID) {
+        this.regionID = regionID;
         bound1 = new Location(world, 0, 0, 0);
         bound2 = new Location(world, 0, 0, 0);
         completeRegion = false;
@@ -42,5 +42,16 @@ public class SSDRegion {
 
     public void setCompleteRegion(boolean completeRegion) {
         this.completeRegion = completeRegion;
+    }
+
+
+    /**
+     *
+     * @param o
+     * @return returns 1 if ID of input is greater than own regionID. 0 if less than. -1 if equal to.
+     */
+    @Override
+    public int compareTo(SSDRegion o) {
+        return regionID;
     }
 }

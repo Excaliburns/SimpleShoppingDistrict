@@ -11,6 +11,7 @@ import tut.simpleshoppingdistrict.utils.SimpleShoppingDistrictItemsUtils;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.TreeSet;
 
 public class SSDDisplayRegionsCommand {
     public static boolean SSDRegionCommand(CommandSender sender) {
@@ -23,11 +24,11 @@ public class SSDDisplayRegionsCommand {
             if (player == null)
                 return false;
 
-            for (Map.Entry<String, ArrayList<SSDRegion>> entry : SSDCache.playerRegionCache.entrySet()) {
+            for (Map.Entry<String, TreeSet<SSDRegion>> entry : SSDCache.playerRegionCache.entrySet()) {
                 player.sendMessage("Player - " + entry.getKey() + " has regions");
 
                 for (SSDRegion region : entry.getValue()) {
-                    player.sendMessage("Region " + region.getRegionID() + " has bounds ");
+                    player.sendMessage("Region " + region.getRegionID()+1 + " has bounds ");
                     player.sendMessage("Bound 1: " + region.getBound1().toString());
                     player.sendMessage("Bound 2: " + region.getBound2().toString());
                 }

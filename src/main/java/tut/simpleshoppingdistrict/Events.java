@@ -10,6 +10,7 @@ import tut.simpleshoppingdistrict.utils.SSDCache;
 import tut.simpleshoppingdistrict.utils.SSDLogger;
 import tut.simpleshoppingdistrict.utils.SimpleShoppingDistrictItemsUtils;
 
+import java.util.UUID;
 import java.util.logging.Logger;
 
 public class Events implements Listener {
@@ -66,15 +67,24 @@ public class Events implements Listener {
 
     private void initializeDrawingBounds(PlayerInteractEvent event) {
         event.getPlayer().sendMessage(ChatColor.AQUA + "Starting Drawing Bounds");
+        String UUID = event.getPlayer().getUniqueId().toString();
+        int nextRegionID;
+
+        if (SSDCache.playerRegionCache.containsKey(UUID)) {
+            nextRegionID = SSDCache.playerRegionCache.get(UUID).last().getRegionID() + 1;
+        } else {
+            nextRegionID = 0;
+        }
+
 
         //Make new SSD Region that we put in the cache of all regions
-        SSDRegion region = new SSDRegion(event.getClickedBlock().getWorld());
+        SSDRegion region = new SSDRegion(event.getClickedBlock().getWorld(), nextRegionID);
 
         Location location = event.getClickedBlock().getLocation();
         region.setBound1(location);
         event.getPlayer().sendMessage(ChatColor.AQUA + "Set Bound 1!");
 
-        String UUID = event.getPlayer().getUniqueId().toString();
+
         SSDCache.playerDrawingRegionCache.put(UUID, true);
         SSDCache.regionInProgressCache.put(UUID, region);
     }
