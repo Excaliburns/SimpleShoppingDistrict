@@ -2,6 +2,7 @@ package tut.simpleshoppingdistrict;
 
 import org.bukkit.plugin.java.JavaPlugin;
 import tut.simpleshoppingdistrict.commands.SSDBaseCommand;
+import tut.simpleshoppingdistrict.utils.JSONUtils;
 import tut.simpleshoppingdistrict.utils.SSDCache;
 
 import java.util.logging.Logger;
@@ -30,5 +31,7 @@ public class SimpleShoppingDistrict extends JavaPlugin {
     @Override
     public void onDisable() {
         // Plugin shutdown logic
+
+        JSONUtils.saveCacheData(SSDCache.playerRegionCache);
     }
 }
