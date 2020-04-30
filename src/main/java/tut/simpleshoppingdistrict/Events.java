@@ -8,14 +8,16 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import tut.simpleshoppingdistrict.data.Point;
 import tut.simpleshoppingdistrict.data.SSDRegion;
 import tut.simpleshoppingdistrict.utils.SSDCache;
+import tut.simpleshoppingdistrict.utils.SSDConstants;
 import tut.simpleshoppingdistrict.utils.SSDLogger;
 import tut.simpleshoppingdistrict.utils.SimpleShoppingDistrictItemsUtils;
 
 import java.util.logging.Logger;
 
 public class Events implements Listener {
-
-    Logger logger = SSDLogger.getSSDLogger();
+    // Constants //////////////////////////////////////////////////////////////////////////////////////////////////////
+    private static final Logger logger       = SSDLogger.getSSDLogger();
+    private static final boolean isDebugMode = SSDConstants.PLUGIN_DEBUG_MODE;
 
     @EventHandler
     public void onRightClick(PlayerInteractEvent event) {
@@ -26,7 +28,7 @@ public class Events implements Listener {
 
                 //If it's air, do nothing
                 if ((event.getClickedBlock() != null && event.getClickedBlock().isEmpty()) || event.getClickedBlock() == null) {
-                    logger.info("Interact block was empty or null.");
+                    logger.warning("Clicked block was air... but also solid.");
                 } else {
                     String UUID = event.getPlayer().getUniqueId().toString();
 
@@ -40,7 +42,9 @@ public class Events implements Listener {
                                 regionInProgress = SSDCache.regionInProgressCache.get(UUID);
 
                                 if (regionInProgress.isCompleteRegion()) {
-                                    logger.warning("Something is wrong. Region is complete but was still being drawn.");
+                                    if (isDebugMode) {
+                                        logger.warning("Player " + event.getPlayer().getName() + "tried to draw a complete region. ID = " + regionInProgress.getRegionID());
+                                    }
                                 } else {
                                     regionInProgress.setBound2(new Point(event.getClickedBlock().getLocation()));
                                     event.getPlayer().sendMessage(ChatColor.AQUA + "Set Bound 2!");
@@ -51,7 +55,9 @@ public class Events implements Listener {
                                     SSDCache.finishDrawingRegion(UUID, regionInProgress);
                                 }
                             } else {
-                                logger.warning("Something is wrong. Player was drawing region but cache does not contain their key.");
+                                if (isDebugMode) {
+                                    logger.warning("Player" + event.getPlayer().getName() + "was drawing region but cache does not contain their UUID.");
+                                }
                             }
 
 
