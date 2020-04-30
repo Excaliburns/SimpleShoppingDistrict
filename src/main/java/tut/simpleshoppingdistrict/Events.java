@@ -5,12 +5,12 @@ import org.bukkit.Location;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
+import tut.simpleshoppingdistrict.data.Point;
 import tut.simpleshoppingdistrict.data.SSDRegion;
 import tut.simpleshoppingdistrict.utils.SSDCache;
 import tut.simpleshoppingdistrict.utils.SSDLogger;
 import tut.simpleshoppingdistrict.utils.SimpleShoppingDistrictItemsUtils;
 
-import java.util.UUID;
 import java.util.logging.Logger;
 
 public class Events implements Listener {
@@ -42,7 +42,7 @@ public class Events implements Listener {
                                 if (regionInProgress.isCompleteRegion()) {
                                     logger.warning("Something is wrong. Region is complete but was still being drawn.");
                                 } else {
-                                    regionInProgress.setBound2(event.getClickedBlock().getLocation());
+                                    regionInProgress.setBound2(new Point(event.getClickedBlock().getLocation()));
                                     event.getPlayer().sendMessage(ChatColor.AQUA + "Set Bound 2!");
 
                                     regionInProgress.setCompleteRegion(true);
@@ -78,14 +78,19 @@ public class Events implements Listener {
 
 
         //Make new SSD Region that we put in the cache of all regions
-        SSDRegion region = new SSDRegion(event.getClickedBlock().getWorld(), nextRegionID);
+        SSDRegion region;
+        Location location;
+        if (event.getClickedBlock()!= null) {
+            region = new SSDRegion(event.getClickedBlock().getWorld(), nextRegionID);
+            location = event.getClickedBlock().getLocation();
+            region.setBound1(new Point(location));
+            event.getPlayer().sendMessage(ChatColor.AQUA + "Set Bound 1!");
 
-        Location location = event.getClickedBlock().getLocation();
-        region.setBound1(location);
-        event.getPlayer().sendMessage(ChatColor.AQUA + "Set Bound 1!");
 
-
-        SSDCache.playerDrawingRegionCache.put(UUID, true);
-        SSDCache.regionInProgressCache.put(UUID, region);
+            SSDCache.playerDrawingRegionCache.put(UUID, true);
+            SSDCache.regionInProgressCache.put(UUID, region);
+        } else {
+            logger.warning("Clicked block was null after being passed to drawingBounds! How?");
+        }
     }
 }

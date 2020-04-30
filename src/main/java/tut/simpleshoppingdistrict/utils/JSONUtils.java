@@ -9,7 +9,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.Buffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,7 +24,10 @@ public class JSONUtils {
 
     //Translating object data to JSON
     private static String objectToJsonString(Object object) {
-        Gson gson = new GsonBuilder().serializeNulls().setPrettyPrinting().create();
+        Gson gson = new GsonBuilder()
+                .serializeNulls()
+                .setPrettyPrinting()
+                .create();
         return gson.toJson(object, object.getClass());
     }
 
@@ -45,7 +47,7 @@ public class JSONUtils {
                 }
 
                 BufferedWriter writer = new BufferedWriter(new FileWriter(filename));
-                writer.write(objectToJsonString(currentRegionList));
+                writer.write(objectToJsonString(new ArrayList<>(currentRegionList)));
                 writer.flush();
                 writer.close();
 
