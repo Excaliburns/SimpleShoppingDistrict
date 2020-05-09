@@ -19,9 +19,10 @@ public class SSDDisplayRegionsCommand {
                 sender.sendMessage("Player - " + entry.getKey() + " has regions");
 
                 for (SSDRegion region : entry.getValue()) {
-                    sender.sendMessage("Region " + region.getRegionID()+1 + " has bounds ");
-                    sender.sendMessage("Bound 1: " + region.getBound1Location().toString());
-                    sender.sendMessage("Bound 2: " + region.getBound2Location().toString());
+                    int regionId = (region.getRegionID() + 1);
+                    System.out.print("\nRegion " + regionId + ":");
+                    System.out.printf("Bound 1: %s", region.getBound1().toString() );
+                    System.out.printf("Bound 2: %s", region.getBound2().toString() );
                 }
             }
 

@@ -1,17 +1,17 @@
 package tut.simpleshoppingdistrict;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import tut.simpleshoppingdistrict.data.Point;
 import tut.simpleshoppingdistrict.data.SSDRegion;
-import tut.simpleshoppingdistrict.utils.SSDCache;
-import tut.simpleshoppingdistrict.utils.SSDConstants;
-import tut.simpleshoppingdistrict.utils.SSDLogger;
-import tut.simpleshoppingdistrict.utils.SimpleShoppingDistrictItemsUtils;
+import tut.simpleshoppingdistrict.utils.*;
 
+import java.util.List;
 import java.util.logging.Logger;
 
 public class Events implements Listener {
@@ -60,7 +60,6 @@ public class Events implements Listener {
                                 }
                             }
 
-
                         } else {
                             initializeDrawingBounds(event);
                         }
@@ -70,6 +69,17 @@ public class Events implements Listener {
                 }
             }
     }
+
+    @EventHandler
+    public void onBreakBlock(BlockBreakEvent event) {
+        Chunk chunk = event.getBlock().getChunk();
+        long chunkHash = SSDUtils.getChunkHash(chunk.getX(), chunk.getZ());
+
+        if (SSDCache.chunkClaimCache.containsKey(chunkHash)) {
+            List<SSDRegion> regionList = SSDCache.chunkClaimCache.get(chunkHash);
+        }
+    }
+
 
     private void initializeDrawingBounds(PlayerInteractEvent event) {
         event.getPlayer().sendMessage(ChatColor.AQUA + "Starting Drawing Bounds");
@@ -87,9 +97,10 @@ public class Events implements Listener {
         SSDRegion region;
         Location location;
         if (event.getClickedBlock()!= null) {
-            region = new SSDRegion(event.getClickedBlock().getWorld(), nextRegionID);
+            region = new SSDRegion(nextRegionID);
             location = event.getClickedBlock().getLocation();
             region.setBound1(new Point(location));
+            region.setWorld(event.getClickedBlock().getWorld().getName());
             event.getPlayer().sendMessage(ChatColor.AQUA + "Set Bound 1!");
 
 

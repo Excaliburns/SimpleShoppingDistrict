@@ -65,4 +65,10 @@ public class Point {
     public void setZ(double z) {
         this.z = z;
     }
+
+
+    @Override
+    public String toString() {
+        return "Point{" + "world='" + world + '\'' + ", x=" + x + ", y=" + y + ", z=" + z + '}';
+    }
 }

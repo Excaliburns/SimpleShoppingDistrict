@@ -13,9 +13,9 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeSet;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 /*Make a way to get and store the data into JSON and pull from JSON
@@ -23,7 +23,7 @@ and get the data from JSON on start up
  */
 public class JSONUtils {
     // Constants //////////////////////////////////////////////////////////////////////////////////////////////////////
-    private static final Logger logger = SSDLogger.getSSDLogger();
+    private static final Logger logger       = SSDLogger.getSSDLogger();
     private static final boolean isDebugMode = SSDConstants.PLUGIN_DEBUG_MODE;
 
     //Translating object data to JSON
@@ -61,7 +61,7 @@ public class JSONUtils {
     }
 
     //Save Json file from the cache
-    public static void saveCacheData(HashMap<String, TreeSet<SSDRegion>> cacheData) {
+    public static void saveCacheData(ConcurrentHashMap<String, TreeSet<SSDRegion>> cacheData) {
         //For each entry of cacheData it serializes the list to Json
         for (Map.Entry<String, TreeSet<SSDRegion>> cacheDataEntry : cacheData.entrySet()) {
             logger.info("Saving cache data for player " + cacheDataEntry.getKey() + ".");

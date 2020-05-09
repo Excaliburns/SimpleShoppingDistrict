@@ -1,8 +1,6 @@
 package tut.simpleshoppingdistrict;
 
-import org.bukkit.command.Command;
 import org.bukkit.command.PluginCommand;
-import org.bukkit.command.defaults.PluginsCommand;
 import org.bukkit.plugin.java.JavaPlugin;
 import tut.simpleshoppingdistrict.commands.SSDBaseCommand;
 import tut.simpleshoppingdistrict.utils.JSONUtils;
@@ -23,7 +21,6 @@ public class SimpleShoppingDistrict extends JavaPlugin {
         SSDCache.initCaches();
     }
 
-
     // After program enabled
     @Override
     public void onEnable() {
@@ -31,7 +28,7 @@ public class SimpleShoppingDistrict extends JavaPlugin {
         SSDCache.loadPlayerRegionCache();
 
         //Initialize task runnable to run every 2.5 minutes
-        SSDCache.startCacheSavingTimer(this);
+        SSDCache.StartCacheSavingTimer(this);
 
         // Register plugin events
         getServer().getPluginManager().registerEvents(new Events(), this);

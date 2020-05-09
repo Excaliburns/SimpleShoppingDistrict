@@ -1,18 +1,24 @@
 package tut.simpleshoppingdistrict.utils;
 
+import org.bukkit.*;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
+import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.util.Vector;
+import tut.simpleshoppingdistrict.SimpleShoppingDistrict;
+import tut.simpleshoppingdistrict.data.Point;
 import tut.simpleshoppingdistrict.data.SSDRegion;
 
-import javax.xml.stream.Location;
 import java.io.File;
 import java.util.*;
-import java.util.logging.Level;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 public class SSDCache {
     // Constants //////////////////////////////////////////////////
     private static final Logger logger = SSDLogger.getSSDLogger();
+    private static Particle.DustOptions dustOptions = new Particle.DustOptions(Color.fromBGR(0, 127, 255), 1);
+    private static BukkitScheduler scheduler = SimpleShoppingDistrict.getPlugin(SimpleShoppingDistrict.class).getServer().getScheduler();
 
     // Stores flag if player is drawing
     // Key is player UUID
@@ -24,12 +30,17 @@ public class SSDCache {
 
     //Stores player regions
     //Key is player UUID
-    public static HashMap<String, TreeSet<SSDRegion>> playerRegionCache;
+    public static ConcurrentHashMap<String, TreeSet<SSDRegion>> playerRegionCache;
+
+    //Stores chunk data and claims within them
+    //Key is hashcode of chunk
+    public static ConcurrentHashMap<Long, List<SSDRegion>> chunkClaimCache;
 
     public static void initCaches() {
-        playerDrawingRegionCache    = new HashMap<>();
-        playerRegionCache           = new HashMap<>();
-        regionInProgressCache       = new HashMap<>();
+        playerDrawingRegionCache = new HashMap<>();
+        regionInProgressCache = new HashMap<>();
+        playerRegionCache = new ConcurrentHashMap<>();
+        chunkClaimCache = new ConcurrentHashMap<>();
     }
 
     public static void loadPlayerRegionCache() {
@@ -46,31 +57,50 @@ public class SSDCache {
         }
     }
 
-    public static void finishDrawingRegion(final String UUID, SSDRegion finishedRegion) {
+    public synchronized static void finishDrawingRegion(final String UUID, SSDRegion finishedRegion) {
         if (playerRegionCache.containsKey(UUID)) {
             TreeSet<SSDRegion> regionList = playerRegionCache.get(UUID);
             regionList.add(finishedRegion);
 
             playerRegionCache.put(UUID, regionList);
-            regionInProgressCache.remove(UUID);
-            playerDrawingRegionCache.remove(UUID);
         } else {
             playerRegionCache.put(UUID, new TreeSet<SSDRegion>() {{
                 add(finishedRegion);
             }});
-            regionInProgressCache.remove(UUID);
-            playerDrawingRegionCache.remove(UUID);
         }
+
+
+        double distance = finishedRegion.getBound1Location().distance(finishedRegion.getBound2Location());
+        Vector p1 = finishedRegion.getBound1Location().toVector();
+        Vector p2 = finishedRegion.getBound2Location().toVector();
+        Vector vector = p2.clone().subtract(p1).normalize();
+        World world = Bukkit.getWorld(finishedRegion.getWorld());
+
+        for (double covered = 0; covered < distance; p1.add(vector)) {
+            if (world != null) {
+                Chunk chunk = world.getChunkAt(p1.toLocation(world));
+                Long chunkHash = SSDUtils.getChunkHash(chunk.getX(), chunk.getZ());
+                List<SSDRegion> regionList;
+
+                if (!SSDCache.chunkClaimCache.containsKey(chunkHash)) {
+                    regionList = new ArrayList<>();
+                } else {
+                    regionList = SSDCache.chunkClaimCache.get(chunkHash);
+                }
+
+                regionList.add(finishedRegion);
+                SSDCache.chunkClaimCache.put(chunkHash, regionList);
+            }
+            covered += 1;
+        }
+
+        regionInProgressCache.remove(UUID);
+        playerDrawingRegionCache.remove(UUID);
     }
 
-    public static void startCacheSavingTimer(JavaPlugin plugin) {
+    public static void StartCacheSavingTimer(JavaPlugin plugin) {
         logger.info("Starting cache saving timer with delay " + SSDConstants.PLUGIN_CACHE_DELAY + " ticks. ");
         BukkitScheduler scheduler = plugin.getServer().getScheduler();
-        scheduler.runTaskTimerAsynchronously(
-                plugin,
-                () -> JSONUtils.saveCacheData(SSDCache.playerRegionCache),
-                SSDConstants.PLUGIN_CACHE_DELAY,
-                SSDConstants.PLUGIN_CACHE_INTERVAL
-        );
+        scheduler.runTaskTimerAsynchronously(plugin, () -> JSONUtils.saveCacheData(SSDCache.playerRegionCache), SSDConstants.PLUGIN_CACHE_DELAY, SSDConstants.PLUGIN_CACHE_INTERVAL);
     }
 }

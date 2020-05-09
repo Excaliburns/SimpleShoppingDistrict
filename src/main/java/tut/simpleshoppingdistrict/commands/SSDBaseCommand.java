@@ -1,5 +1,7 @@
 package tut.simpleshoppingdistrict.commands;
 
+import org.bukkit.Chunk;
+import org.bukkit.Material;
 import org.bukkit.Server;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
