@@ -5,6 +5,7 @@ import org.bukkit.scheduler.BukkitScheduler;
 import tut.simpleshoppingdistrict.data.SSDRegion;
 
 import java.io.File;
+import java.nio.file.Files;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
@@ -25,19 +26,25 @@ public class SSDCache {
     //Key is player UUID
     public static ConcurrentHashMap<String, TreeSet<SSDRegion>> playerRegionCache;
 
-    //Stores chunk data and claims within them
-    //Key is hashcode of chunk
+    // Stores chunk data and claims within them
+    // Key is hashcode of chunk
     public static ConcurrentHashMap<Long, List<SSDRegion>> chunkClaimCache;
+
+    // Stores chunk hash and players that have claims within those chunks
+    // Key is hashcode of chunk
+    public static ConcurrentHashMap<Long, HashSet<String>> chunkHashToPlayerIds;
 
     static {
         playerDrawingRegionCache = new HashMap<>();
         regionInProgressCache = new HashMap<>();
         playerRegionCache = new ConcurrentHashMap<>();
         chunkClaimCache = new ConcurrentHashMap<>();
+        chunkHashToPlayerIds = new ConcurrentHashMap<>();
     }
 
     public static void loadPlayerRegionCache() {
-        File[] diskData = new File(SSDConstants.BASE_PLUGIN_FOLDER_PATH + "playerdata" + File.separator).listFiles();
+        File chunkCache = new File(SSDConstants.BASE_PLUGIN_FOLDER_PATH + File.separator + "chunkdata.json");
+        File[] diskData = new File(SSDConstants.BASE_PLUGIN_FOLDER_PATH + File.separator + "playerdata").listFiles();
 
         if (diskData != null) {
             for (File file : diskData) {
@@ -45,8 +52,16 @@ public class SSDCache {
                 playerRegionCache.put(UUID, JSONUtils.getPlayerRegionDataFromFile(file));
             }
 
-        } else {
+        }
+        else {
             logger.warning("Could not find files of region data. If this is the first time running the server, this is to be expected.");
+        }
+
+        if (chunkCache.exists()) {
+            chunkHashToPlayerIds = new ConcurrentHashMap<>(JSONUtils.getChunksWithPlayerInformationFromFile(chunkCache));
+        }
+        else {
+            logger.warning("Could not find chunk cache data. If this is the first time running the server, this is to be expected.");
         }
     }
 

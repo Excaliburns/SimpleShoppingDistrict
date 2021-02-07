@@ -76,6 +76,21 @@ public class JSONUtils {
         return new TreeSet<>();
     }
 
+    public static HashMap<Long, HashSet<String>> getChunksWithPlayerInformationFromFile(File file) {
+        String jsonText;
+
+        try {
+            jsonText = new String(Files.readAllBytes(file.toPath()));
+
+            return jsonStringToChunkCache(jsonText);
+        } catch (IOException e) {
+            logger.warning("Could not load file: " + getBaseFileName(file.getName()) + " cache will not have the relevant data. Printing stack trace.");
+            e.printStackTrace();
+        }
+
+        return new HashMap<>();
+    }
+
     //Save Json file from the cache
     public static void savePlayerCacheData(ConcurrentHashMap<String, TreeSet<SSDRegion>> cacheData) {
         HashMap<Long, HashSet<String>> chunkPlayerClaimContainer = new HashMap<>();
