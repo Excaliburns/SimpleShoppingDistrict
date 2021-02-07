@@ -12,7 +12,6 @@ public class SpawnParticleRunnable extends BukkitRunnable {
     private Player player;
     private Plugin plugin;
     private Location[] locations;
-
     private int timerCounter = 0;
 
 
@@ -23,7 +22,7 @@ public class SpawnParticleRunnable extends BukkitRunnable {
     }
 
     public void start() {
-        this.runTaskTimer(plugin, 0, 20);
+        this.runTaskTimer(plugin, 0, 1);
     }
 
     public void stop() {
@@ -45,6 +44,12 @@ public class SpawnParticleRunnable extends BukkitRunnable {
     public void run() {
         for (Location l : locations) {
             player.spawnParticle(Particle.REDSTONE, l, 1, dustOptions);
+        }
+
+        timerCounter++;
+
+        if (timerCounter >= 200) {
+            this.stop();
         }
     }
 }

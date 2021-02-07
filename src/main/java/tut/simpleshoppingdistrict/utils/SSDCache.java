@@ -28,7 +28,7 @@ public class SSDCache {
 
     // Stores chunk data and claims within them
     // Key is hashcode of chunk
-    public static ConcurrentHashMap<Long, List<SSDRegion>> chunkClaimCache;
+    public static ConcurrentHashMap<Long, HashSet<SSDRegion>> chunkClaimCache;
 
     // Stores chunk hash and players that have claims within those chunks
     // Key is hashcode of chunk

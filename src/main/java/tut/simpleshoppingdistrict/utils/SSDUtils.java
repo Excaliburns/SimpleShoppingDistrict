@@ -8,8 +8,7 @@ import org.bukkit.util.Vector;
 import tut.simpleshoppingdistrict.data.Point;
 import tut.simpleshoppingdistrict.data.SSDRegion;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 
 public class SSDUtils {
 
@@ -24,14 +23,14 @@ public class SSDUtils {
             if (world != null) {
                 Chunk chunk = world.getChunkAt(p1.toLocation(world));
                 Long chunkHash = SSDUtils.getChunkHash(chunk.getX(), chunk.getZ());
-                List<SSDRegion> regionList;
+                HashSet<SSDRegion> regionList;
 
                 if (!region.getChunkContainerHash().contains(chunkHash)) {
                     region.addChunkToContainerHashList(chunkHash);
                 }
 
                 if (!SSDCache.chunkClaimCache.containsKey(chunkHash)) {
-                    regionList = new ArrayList<>();
+                    regionList = new HashSet<>();
                 } else {
                     regionList = SSDCache.chunkClaimCache.get(chunkHash);
                 }
@@ -55,5 +54,9 @@ public class SSDUtils {
     //Thank you GriefPrevention :cry:
     public static long getChunkHash(long x, long z) {
         return (x ^ (z >> 32));
+    }
+
+    public static long getChunkHash(Chunk chunk) {
+        return getChunkHash(chunk.getX(), chunk.getZ());
     }
 }

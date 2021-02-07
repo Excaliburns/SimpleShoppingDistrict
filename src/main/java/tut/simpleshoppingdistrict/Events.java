@@ -17,8 +17,12 @@ import tut.simpleshoppingdistrict.data.SSDRegion;
 import tut.simpleshoppingdistrict.runnables.SpawnParticleRunnable;
 import tut.simpleshoppingdistrict.utils.*;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 public class Events implements Listener {
     private static BukkitScheduler scheduler = SimpleShoppingDistrict.getPlugin(SimpleShoppingDistrict.class).getServer().getScheduler();
@@ -85,7 +89,7 @@ public class Events implements Listener {
         long chunkHash = SSDUtils.getChunkHash(chunk.getX(), chunk.getZ());
 
         if (SSDCache.chunkClaimCache.containsKey(chunkHash)) {
-            List<SSDRegion> regionList = SSDCache.chunkClaimCache.get(chunkHash);
+            Set<SSDRegion> regionList = SSDCache.chunkClaimCache.get(chunkHash);
 
             for (SSDRegion region : regionList) {
                 final boolean brokenBlockWithinRegion = event.getBlock().getLocation().toVector()
@@ -107,12 +111,35 @@ public class Events implements Listener {
 
     @EventHandler
     public void onChunkLoad(final ChunkLoadEvent event){
-        System.out.println("test1");
+        Long hash = SSDUtils.getChunkHash(event.getChunk());
+        HashSet<String> playersThatHaveClaimsInRegion = SSDCache.chunkHashToPlayerIds.get(hash);
+
+        if (playersThatHaveClaimsInRegion != null && !playersThatHaveClaimsInRegion.isEmpty()) {
+            HashSet<SSDRegion> playerClaimsInRegion = new HashSet<>();
+
+            for (String pUuid : playersThatHaveClaimsInRegion) {
+                playerClaimsInRegion.addAll(
+                        SSDCache.playerRegionCache.get(pUuid)
+                                                  .stream()
+                                                  .filter(region -> region.getChunkContainerHash().contains(hash))
+                                                  .collect(Collectors.toList())
+                );
+            }
+
+            if (!SSDCache.chunkClaimCache.containsKey(hash)) {
+                SSDCache.chunkClaimCache.put(hash, playerClaimsInRegion);
+            }
+            else {
+                playerClaimsInRegion.addAll(SSDCache.chunkClaimCache.get(hash));
+                SSDCache.chunkClaimCache.put(hash, playerClaimsInRegion);
+            }
+
+        }
     }
 
     @EventHandler
     public void onChunkUnload(final ChunkUnloadEvent event){
-        System.out.println("test2");
+        SSDCache.chunkClaimCache.remove(SSDUtils.getChunkHash(event.getChunk()));
     }
 
 
