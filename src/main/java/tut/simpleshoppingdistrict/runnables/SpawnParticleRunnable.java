@@ -9,15 +9,14 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class SpawnParticleRunnable extends BukkitRunnable {
-    private static ConcurrentHashMap<Integer, HashSet<String>> playersViewingParticleRunnable;
-    private static Particle.DustOptions dustOptions = new Particle.DustOptions(Color.fromBGR(0, 127, 255), .25f);
-    private Player player;
-    private Plugin plugin;
-    private Location[] locations;
+    private static final ConcurrentHashMap<Integer, HashSet<String>> playersViewingParticleRunnable;
+    private static final Particle.DustOptions dustOptions = new Particle.DustOptions(Color.fromBGR(0, 127, 255), .75f);
+    private final Player player;
+    private final Plugin plugin;
+    private final Location[] locations;
     private int timerCounter = 0;
 
     static {
@@ -44,7 +43,7 @@ public class SpawnParticleRunnable extends BukkitRunnable {
         if (!currentPlayersRunning.contains(this.player.getUniqueId().toString())) {
             currentPlayersRunning.add(this.player.getUniqueId().toString());
             playersViewingParticleRunnable.put(locationHash, currentPlayersRunning);
-            this.runTaskTimer(plugin, 0, 1);
+            this.runTaskTimer(plugin, 0, 20);
         }
     }
 
@@ -82,7 +81,7 @@ public class SpawnParticleRunnable extends BukkitRunnable {
 
         timerCounter++;
 
-        if (timerCounter >= 200) {
+        if (timerCounter >= 10) {
             this.stop();
         }
     }

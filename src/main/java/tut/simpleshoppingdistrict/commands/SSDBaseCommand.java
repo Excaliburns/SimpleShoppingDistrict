@@ -38,7 +38,7 @@ public class SSDBaseCommand implements CommandExecutor {
                     String arg = args[0];
 
                     if (arg.equalsIgnoreCase("regions")) {
-                        return SSDDisplayRegionsCommand.SSDRegionCommand(sender);
+                        return SSDDisplayRegionsCommand.SSDRegionCommand(player);
                     }
 
                     else if (arg.equalsIgnoreCase("save")) {
