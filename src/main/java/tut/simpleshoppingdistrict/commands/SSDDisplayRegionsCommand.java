@@ -20,9 +20,10 @@ public class SSDDisplayRegionsCommand {
 
                 for (SSDRegion region : entry.getValue()) {
                     int regionId = (region.getRegionID() + 1);
-                    System.out.print("\nRegion " + regionId + ":");
-                    System.out.printf("Bound 1: %s", region.getBound1().toString() );
-                    System.out.printf("Bound 2: %s", region.getBound2().toString() );
+                    sender.sendMessage("Region " + regionId + ": ");
+                    String sb = String.format("Bound 1: %s\n", region.getBound1().toString())
+                              + String.format("Bound 2: %s", region.getBound2().toString());
+                    sender.sendMessage(sb);
                 }
             }
 

@@ -13,17 +13,19 @@ public class SimpleShoppingDistrict extends JavaPlugin {
     // Constants //////////////////////////////////////////////////////////////////////////////////////////////////////
     private final Logger logger              = this.getLogger();
     private static final boolean isDebugMode = SSDConstants.PLUGIN_DEBUG_MODE;
+    private static SimpleShoppingDistrict instance;
 
     //This runs after program has ben loaded and before it has been enabled.
     @Override
     public void onLoad() {
         logger.info("SimpleShoppingDistrict has loaded!");
-        SSDCache.initCaches();
     }
 
     // After program enabled
     @Override
     public void onEnable() {
+        instance = this;
+
         //Load caches
         SSDCache.loadPlayerRegionCache();
 
@@ -46,6 +48,10 @@ public class SimpleShoppingDistrict extends JavaPlugin {
     @Override
     public void onDisable() {
         // Plugin shutdown logic
-        JSONUtils.saveCacheData(SSDCache.playerRegionCache);
+        JSONUtils.savePlayerCacheData(SSDCache.playerRegionCache);
+    }
+
+    public static SimpleShoppingDistrict getInstance() {
+        return instance;
     }
 }

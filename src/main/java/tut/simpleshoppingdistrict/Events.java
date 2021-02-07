@@ -2,19 +2,28 @@ package tut.simpleshoppingdistrict;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
+import org.bukkit.Color;
 import org.bukkit.Location;
+import org.bukkit.Particle;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.world.ChunkLoadEvent;
+import org.bukkit.event.world.ChunkUnloadEvent;
+import org.bukkit.scheduler.BukkitScheduler;
 import tut.simpleshoppingdistrict.data.Point;
 import tut.simpleshoppingdistrict.data.SSDRegion;
+import tut.simpleshoppingdistrict.runnables.SpawnParticleRunnable;
 import tut.simpleshoppingdistrict.utils.*;
 
 import java.util.List;
 import java.util.logging.Logger;
 
 public class Events implements Listener {
+    private static BukkitScheduler scheduler = SimpleShoppingDistrict.getPlugin(SimpleShoppingDistrict.class).getServer().getScheduler();
+
+
     // Constants //////////////////////////////////////////////////////////////////////////////////////////////////////
     private static final Logger logger       = SSDLogger.getSSDLogger();
     private static final boolean isDebugMode = SSDConstants.PLUGIN_DEBUG_MODE;
@@ -77,7 +86,33 @@ public class Events implements Listener {
 
         if (SSDCache.chunkClaimCache.containsKey(chunkHash)) {
             List<SSDRegion> regionList = SSDCache.chunkClaimCache.get(chunkHash);
+
+            for (SSDRegion region : regionList) {
+                final boolean brokenBlockWithinRegion = event.getBlock().getLocation().toVector()
+                                                             .isInAABB(
+                                                                     SSDUtils.getMinLocationFromTwoPoints(region.getBound1(), region.getBound2(), event.getBlock().getWorld()).toVector(),
+                                                                     SSDUtils.getMaxLocationFromTwoPoints(region.getBound1(), region.getBound2(), event.getBlock().getWorld()).toVector()
+                                                             );
+                if (brokenBlockWithinRegion) {
+                    event.setCancelled(true);
+
+                    final Location[] regionCube = ParticleUtils.getCuboidPointsFromRegionBounds(region.getBound1(), region.getBound2(), event.getBlock().getWorld());
+
+                    final SpawnParticleRunnable runnable = new SpawnParticleRunnable(event.getPlayer(), SimpleShoppingDistrict.getInstance(), regionCube);
+                    runnable.start();
+                }
+            }
         }
+    }
+
+    @EventHandler
+    public void onChunkLoad(final ChunkLoadEvent event){
+        System.out.println("test1");
+    }
+
+    @EventHandler
+    public void onChunkUnload(final ChunkUnloadEvent event){
+        System.out.println("test2");
     }
 
 
@@ -87,7 +122,7 @@ public class Events implements Listener {
         int nextRegionID;
 
         if (SSDCache.playerRegionCache.containsKey(UUID)) {
-            nextRegionID = SSDCache.playerRegionCache.get(UUID).last().getRegionID() + 1;
+            nextRegionID = SSDCache.playerRegionCache.get(UUID).first().getRegionID() + 1;
         } else {
             nextRegionID = 0;
         }
@@ -101,6 +136,10 @@ public class Events implements Listener {
             location = event.getClickedBlock().getLocation();
             region.setBound1(new Point(location));
             region.setWorld(event.getClickedBlock().getWorld().getName());
+            region.addChunkToContainerHashList(
+                    SSDUtils.getChunkHash(location.getChunk().getX(), location.getChunk().getZ())
+            );
+
             event.getPlayer().sendMessage(ChatColor.AQUA + "Set Bound 1!");
 
 
